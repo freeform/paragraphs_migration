@@ -1,0 +1,17 @@
+{
+    "name": "drupal/paragraphs_migration",
+    "type": "drupal-module",
+    "description": "Drupal 7 to Drupal 8/9 migration path for the D7 Field Collection, D7 Paragraphs, D7 Multifield.",
+    "keywords": [
+      "Drupal"
+    ],
+    "license": "GPL-2.0+",
+    "homepage": "https://www.drupal.org/project/paragraphs_migration",
+    "support": {
+        "issues": "https://drupal.org/project/issues/paragraphs_migration",
+        "source": "https://git.drupalcode.org/project/paragraphs_migration"
+    },
+    "require": {
+        "drupal/paragraphs": "1.12"
+    }
+}
