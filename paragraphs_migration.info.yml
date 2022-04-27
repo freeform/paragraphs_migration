@@ -5,3 +5,4 @@ core_version_requirement: ^9
 package: 'Migration'
 dependencies:
   - paragraphs:paragraphs
+  - smart_sql_idmap:smart_sql_idmap
