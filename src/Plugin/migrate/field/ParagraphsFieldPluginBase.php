@@ -39,6 +39,16 @@ abstract class ParagraphsFieldPluginBase extends FieldPluginBase {
    *   Array of the required migrations.
    */
   protected function getParentBasedMigrationDependencies(MigrationInterface $migration, string $field_name) {
+    // Paragraphs provided migrations aren't dropped yet, their derivers are
+    // invoked. And this method won't find either a source nor a destination
+    // entity type ID, and would throw a LogicException.
+    // But since we will drop them in our hook_migration_plugins_alter()
+    // implementations, it is safe to return an empty array in every case when
+    // the provider of the actual migration is 'paragraphs'.
+    // See \Drupal\migrate\Plugin\MigrationPluginManager::getDiscovery().
+    if ($migration->getPluginDefinition()['provider'] === 'paragraphs') {
+      return [];
+    }
     // Add the respective paragraphs or field collection migration dependency.
     $required_migrations = [];
     $destination_plugin = $migration->getDestinationPlugin();

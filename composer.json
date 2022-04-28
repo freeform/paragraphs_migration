@@ -12,12 +12,15 @@
         "source": "https://git.drupalcode.org/project/paragraphs_migration"
     },
     "require": {
-        "drupal/paragraphs": "1.12",
+        "drupal/paragraphs": "^1.12",
         "drupal/smart_sql_idmap": "^1.1@beta"
     },
     "patches": {
       "drupal/core": {
         "Issue #3218294: Allow altering field value query performed by FieldableEntity": "https://www.drupal.org/files/issues/2021-06-10/core-allow_altering_migrate_field_value_query-3218294-2.patch"
+      },
+      "drupal/entity_reference_revisions": {
+        "Issue #3218312: Provide an option to skip (opt-out) forcibly created new revision of the referenced entity (so that migrations won't lead to unnecessary saved revisions)": "https://www.drupal.org/files/issues/2021-06-10/entity_reference_revisions-opt_out_new_revision_save-3218312-2.patch"
       }
     }
 }
