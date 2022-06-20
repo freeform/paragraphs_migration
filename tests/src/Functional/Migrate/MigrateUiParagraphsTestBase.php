@@ -23,12 +23,9 @@ abstract class MigrateUiParagraphsTestBase extends MigrateUpgradeTestBase {
    */
   public static $modules = [
     'content_translation',
-    'migrate_drupal_multilingual',
     'migrate_drupal_ui',
-    'paragraphs',
     'telephone',
     'paragraphs_migration',
-    'smart_sql_idmap',
   ];
 
   /**
