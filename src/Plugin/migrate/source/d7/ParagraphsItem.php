@@ -98,6 +98,8 @@ class ParagraphsItem extends FieldableEntity {
       $query->condition('p.bundle', $bundle);
     }
 
+    $query->condition('p.archived', 1, '<>');
+
     return $query;
   }
 
