@@ -90,21 +90,4 @@ class FieldCollectionType extends DrupalSqlBase {
     return $ids;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setConfiguration(array $configuration) {
-    // Configuration keys should be snake_case, not CamelCase. Adding a BC
-    // layer for addDescription which should be deprecated.
-    if (isset($configuration['addDescription'])) {
-      @trigger_error("The addDescription configuration key is deprecated in paragraphs:8.x-1.0 and is removed from paragraphs:8.x-2.0. Use add_description instead. See https://www.drupal.org/project/paragraphs/issues/2911242", E_USER_DEPRECATED);
-      if (!isset($configuration['add_description'])) {
-        $configuration['add_description'] = $configuration['addDescription'];
-      }
-      unset($configuration['addDescription']);
-    }
-
-    parent::setConfiguration($configuration);
-  }
-
 }
