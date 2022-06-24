@@ -14,6 +14,40 @@ use Drupal\paragraphs_migration\ParagraphsMigration;
 abstract class ParagraphsFieldPluginBase extends FieldPluginBase {
 
   /**
+   * The base plugin IDs of paragraphs migrations.
+   *
+   * @const string[]
+   */
+  const PARA_MIGRATION_BASE_PLUGIN_IDS = [
+    'd7_pm_paragraphs',
+    'd7_pm_paragraphs_revisions',
+  ];
+
+  /**
+   * The base plugin IDs of field collection migrations.
+   *
+   * @const string[]
+   */
+  const FC_MIGRATION_BASE_PLUGIN_IDS = [
+    'd7_pm_field_collection',
+    'd7_pm_field_collection_revisions',
+  ];
+
+  /**
+   * Legacy entity ID of paragraphs entities.
+   *
+   * @const string
+   */
+  const PARA_LEGACY_ENTITY_TYPE_ID = 'paragraphs_item';
+
+  /**
+   * Legacy entity ID of field collection entities.
+   *
+   * @const string
+   */
+  const FC_LEGACY_ENTITY_TYPE_ID = 'field_collection_item';
+
+  /**
    * The base ID of the default revision's migration.
    *
    * @var string
@@ -128,6 +162,45 @@ abstract class ParagraphsFieldPluginBase extends FieldPluginBase {
     return strpos($destination_plugin_id, 'entity_revision:') === 0
       || strpos($destination_plugin_id, 'entity_complete:') === 0
       || (strpos($destination_plugin_id, 'entity_reference_revisions:') === 0 && !empty($destination_config['new_revisions']));
+  }
+
+  /**
+   * Returns the dep type of component migrations in the current migration.
+   *
+   * @param \Drupal\migrate\Plugin\MigrationInterface|string $migration_or_migration_id
+   *   The migration or the full ID of the migration which depends on component
+   *   migrations. "Component migration" means paragraphs item or field
+   *   collection item migration.
+   *
+   * @return string
+   *   The dependency type of component migrations in the current migration.
+   *   This will be either "required" or "optional".
+   */
+  public static function getComponentDependencyType(string $migration_base_id, array $source_config): string {
+    // If the actual migration is a paragraphs or a field collection
+    // migration AND the host entity is either a paragraph item or field
+    // collection item, then we will return 'required'.
+    $current_migration_is_component_migration = in_array(
+      $migration_base_id,
+      array_merge(static::PARA_MIGRATION_BASE_PLUGIN_IDS, static::FC_MIGRATION_BASE_PLUGIN_IDS),
+      TRUE
+    );
+    // Field plugins are invoked before the migration has any derivative ID.
+    // So we won't have the final "full" plugin IDs when this static method is
+    // invoked by FieldDiscoveryInterface::addBundleFieldProcesses (e.g. in
+    // D7FieldCollectionItemDeriver or in D7ParagraphsItemDeriver). But we
+    // can rely on the 'parent_type' source configuration: because we add it
+    // BEFORE FieldDiscoveryInterface::addBundleFieldProcesses is invoked.
+    $host_entity_type_id = $source_config['parent_type'] ?? NULL;
+    $host_is_a_legacy_component = in_array(
+      $host_entity_type_id,
+      [static::PARA_LEGACY_ENTITY_TYPE_ID, static::FC_LEGACY_ENTITY_TYPE_ID],
+      TRUE
+    );
+
+    return $current_migration_is_component_migration && $host_is_a_legacy_component
+      ? 'optional'
+      : 'required';
   }
 
 }

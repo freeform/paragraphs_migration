@@ -22,6 +22,7 @@ abstract class ParagraphsMigrationTestBase extends MigrateDrupalTestBase {
     'migrate_drupal',
     'paragraphs',
     'paragraphs_migration',
+    'migmag_process',
     'smart_sql_idmap',
   ];
 

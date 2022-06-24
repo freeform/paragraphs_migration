@@ -47,31 +47,30 @@ class FieldCollection extends ParagraphsFieldPluginBase {
       'plugin' => 'sub_process',
       'process' => [
         'id_lookup' => [
-          'plugin' => 'pm_paragraphs_lookup',
-          'tags' => 'Field Collection Content',
+          'plugin' => 'migmag_lookup',
+          'migration' => 'd7_pm_field_collection',
           'source' => 'value',
-          'no_stub' => TRUE,
         ],
         'rev_lookup' => [
-          'plugin' => 'pm_paragraphs_lookup',
-          'tags' => 'Field Collection Revisions Content',
+          'plugin' => 'migmag_lookup',
+          'migration' => 'd7_pm_field_collection_revisions',
           'source' => 'revision_id',
-          'no_stub' => TRUE,
         ],
         'target_id' => [
           'plugin' => 'skip_on_empty',
           'method' => 'process',
-          'source' => '@id_lookup/id',
+          'source' => '@id_lookup/0',
         ],
-        // Try to restora some level of data integrity if the corresponding
+        // Try to restore some level of data integrity if the corresponding
         // field collection revision ID is missing.
         'target_revision_id' => [
           [
             'plugin' => 'null_coalesce',
             'source' => [
-              '@rev_lookup/revision_id',
-              '@id_lookup/revision_id',
+              '@rev_lookup/1',
+              '@id_lookup/1',
             ],
+            'default_value' => NULL,
           ],
           [
             'plugin' => 'skip_on_empty',
@@ -91,11 +90,12 @@ class FieldCollection extends ParagraphsFieldPluginBase {
     $migration->setProcessOfProperty($field_name, $process);
 
     // Add the respective field collection migration as a dependency.
+    $dependency_type = static::getComponentDependencyType($migration->getBaseId(), $migration->getSourceConfiguration());
     $dependencies = $migration->getMigrationDependencies();
     $required_migrations = $this->getParentBasedMigrationDependencies($migration, $field_name);
-    $dependencies['required'] = array_unique(
+    $dependencies[$dependency_type] = array_unique(
       array_merge(
-        array_values($dependencies['required']),
+        array_values($dependencies[$dependency_type]),
         $required_migrations
       )
     );

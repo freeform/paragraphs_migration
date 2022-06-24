@@ -9,11 +9,9 @@ source:
   plugin: d7_pm_paragraphs_item_revision
 process:
   id_lookup:
-    plugin: pm_paragraphs_lookup
-    tags:
-      - Paragraphs Content
+    plugin: migmag_lookup
+    migration: d7_pm_paragraphs
     source: item_id
-    no_stub: true
   missing_revision_logging:
     source: '@id_lookup'
     plugin: skip_on_empty
@@ -23,7 +21,7 @@ process:
     plugin: extract
     source: '@id_lookup'
     index:
-      - id
+      - 0
   type:
     plugin: migration_lookup
     migration: d7_pm_paragraphs_type

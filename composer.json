@@ -12,6 +12,7 @@
         "source": "https://git.drupalcode.org/project/paragraphs_migration"
     },
     "require": {
+        "drupal/migmag": "^1.3.0",
         "drupal/paragraphs": "^1.12",
         "drupal/smart_sql_idmap": "^1.1@beta"
     },

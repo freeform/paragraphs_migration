@@ -6,6 +6,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\migrate\Plugin\MigratePluginManagerInterface;
 use Drupal\migrate\Plugin\MigrationDeriverTrait;
 use Drupal\migrate\Row;
+use Drupal\paragraphs_migration\Plugin\migrate\field\ParagraphsFieldPluginBase;
 
 /**
  * Alters migrations for being compatible with paragraphs.
@@ -116,9 +117,10 @@ final class MigrationPluginsAlterer {
       }
 
       $paragraph_unfinalized_dependencies = $migration['source'][ParagraphsMigration::PARAGRAPHS_RAW_DEPENDENCIES] ?? [];
+      $component_dependency_type = ParagraphsFieldPluginBase::getComponentDependencyType($migration['id'], $migration['source']);
       foreach ($paragraph_unfinalized_dependencies as $unfinalized_dependency) {
-        if (($dep_key = array_search($unfinalized_dependency, $migration['migration_dependencies']['required'])) !== FALSE) {
-          unset($migration['migration_dependencies']['required'][$dep_key]);
+        if (($dep_key = array_search($unfinalized_dependency, $migration['migration_dependencies'][$component_dependency_type])) !== FALSE) {
+          unset($migration['migration_dependencies'][$component_dependency_type][$dep_key]);
           $finalized_dependencies = array_reduce($migration_plugin_ids, function (array $carry, string $plugin_id) use ($unfinalized_dependency) {
             if (strpos($plugin_id, $unfinalized_dependency) === 0) {
               $carry[] = $plugin_id;
@@ -132,7 +134,7 @@ final class MigrationPluginsAlterer {
           if (($self_dep_key = array_search($migration_plugin_id, $finalized_dependencies)) !== FALSE) {
             unset($finalized_dependencies[$self_dep_key]);
           }
-          $migration['migration_dependencies']['required'] = array_unique(array_merge($migration['migration_dependencies']['required'], $finalized_dependencies));
+          $migration['migration_dependencies'][$component_dependency_type] = array_unique(array_merge($migration['migration_dependencies'][$component_dependency_type], $finalized_dependencies));
         }
       }
       unset($migration['source'][ParagraphsMigration::PARAGRAPHS_RAW_DEPENDENCIES]);
