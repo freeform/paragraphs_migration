@@ -18,7 +18,7 @@ class FieldCollectionItemSourceTest extends MigrateSqlSourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['migrate_drupal', 'paragraphs',
+  protected static $modules = ['migrate_drupal', 'paragraphs',
     'paragraphs_migration',
   ];
 

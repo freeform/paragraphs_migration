@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\paragraphs_migration\Unit\migrate;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\MigrateSkipRowException;
 use Drupal\paragraphs_migration\Plugin\migrate\process\FieldCollectionFieldInstanceSettings;
@@ -15,6 +16,7 @@ use Prophecy\Argument;
  */
 class FieldCollectionsFieldInstanceSettingsTest extends ProcessTestCase {
 
+  use ProphecyTrait;
   /**
    * MigrateLookup object prophecy.
    *
@@ -25,7 +27,7 @@ class FieldCollectionsFieldInstanceSettingsTest extends ProcessTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->lookup = $this->prophesize(MigrateLookupInterface::class);

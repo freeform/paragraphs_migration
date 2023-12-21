@@ -1,7 +1,7 @@
 {
     "name": "drupal/paragraphs_migration",
     "type": "drupal-module",
-    "description": "Drupal 7 to Drupal 8/9 migration path for the D7 Field Collection, D7 Paragraphs, D7 Multifield.",
+    "description": "Drupal 7 to Drupal 8/9/10 migration path for the D7 Field Collection, D7 Paragraphs, D7 Multifield.",
     "keywords": [
       "Drupal"
     ],

@@ -13,19 +13,17 @@ abstract class ProcessTestCase extends MigrateProcessTestCase {
   /**
    * The entity bundle info service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\PHPUnit_Framework_MockObject_InvocationMocker
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\PHPUnit\Framework\MockObject\InvocationMocker
    */
   protected $entityTypeBundleInfo;
 
   /**
    * {@inheritdoc}
    */
-  protected function setup() {
+  protected function setup(): void {
     parent::setUp();
 
-    $this->entityTypeBundleInfo = $this->getMockBuilder(EntityTypeBundleInfo::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->entityTypeBundleInfo = $this->createMock(EntityTypeBundleInfo::class);
     $bundles = [
       'paragraph_bundle_one' => [],
       'paragraph_bundle_two' => [],

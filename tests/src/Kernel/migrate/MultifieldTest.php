@@ -22,7 +22,7 @@ class MultifieldTest extends MigrateDrupalTestBase {
    *   support ends.
    * @see https://www.drupal.org/node/2909426
    */
-  public static $modules = [
+  protected static $modules = [
     'comment',
     'config_translation',
     'content_translation',
@@ -52,7 +52,7 @@ class MultifieldTest extends MigrateDrupalTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     MigrateDrupalTestBase::setUp();
 
     $this->installEntitySchema('file');
@@ -67,14 +67,14 @@ class MultifieldTest extends MigrateDrupalTestBase {
     $this->installConfig(['comment', 'node']);
 
     $this->loadFixture(implode(DIRECTORY_SEPARATOR, [
-      drupal_get_path('module', 'migrate_drupal'),
+      \Drupal::service('extension.list.module')->getPath('migrate_drupal'),
       'tests',
       'fixtures',
       'drupal7.php',
     ]));
 
     $this->loadFixture(implode(DIRECTORY_SEPARATOR, [
-      drupal_get_path('module', 'paragraphs_migration'),
+      \Drupal::service('extension.list.module')->getPath('paragraphs_migration'),
       'tests',
       'fixtures',
       'drupal7_multifield_on_core_fixture.php',
@@ -90,7 +90,7 @@ class MultifieldTest extends MigrateDrupalTestBase {
     // migrate the public files.
     $fs_fixture_path = implode(DIRECTORY_SEPARATOR, [
       DRUPAL_ROOT,
-      drupal_get_path('module', 'paragraphs_migration'),
+      \Drupal::service('extension.list.module')->getPath('paragraphs_migration'),
       'tests',
       'fixtures',
     ]);

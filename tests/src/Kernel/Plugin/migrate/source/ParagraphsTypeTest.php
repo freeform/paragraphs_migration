@@ -15,7 +15,7 @@ class ParagraphsTypeTest extends MigrateSqlSourceTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'migrate_drupal',
     'paragraphs',
     'paragraphs_migration',

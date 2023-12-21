@@ -16,7 +16,7 @@ abstract class ParagraphsMigrationTestBase extends MigrateDrupalTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'entity_reference_revisions',
     'migrate',
     'migrate_drupal',
@@ -29,7 +29,7 @@ abstract class ParagraphsMigrationTestBase extends MigrateDrupalTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->loadFixture(__DIR__ . '/../../../fixtures/drupal7.php');
 

@@ -21,7 +21,7 @@ abstract class MigrateUiParagraphsTestBase extends MigrateUpgradeTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'content_translation',
     'migrate_drupal_ui',
     'telephone',
@@ -32,14 +32,14 @@ abstract class MigrateUiParagraphsTestBase extends MigrateUpgradeTestBase {
    * {@inheritdoc}
    */
   protected function getSourceBasePath() {
-    return drupal_get_path('module', 'paragraphs_migration') . '/tests/fixtures';
+    return \Drupal::service('extension.list.module')->getPath('paragraphs_migration') . '/tests/fixtures';
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getSourcePrivateFilesPath() {
-    return drupal_get_path('module', 'paragraphs_migration') . '/tests/fixtures';
+    return \Drupal::service('extension.list.module')->getPath('paragraphs_migration') . '/tests/fixtures';
   }
 
   /**
@@ -490,10 +490,10 @@ abstract class MigrateUiParagraphsTestBase extends MigrateUpgradeTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
-    $this->loadFixture(drupal_get_path('module', 'paragraphs_migration') . '/tests/fixtures/drupal7.php');
+    $this->loadFixture(\Drupal::service('extension.list.module')->getPath('paragraphs_migration') . '/tests/fixtures/drupal7.php');
   }
 
   /**
@@ -506,7 +506,7 @@ abstract class MigrateUiParagraphsTestBase extends MigrateUpgradeTestBase {
 
     // ID conflict form.
     $session->buttonExists($this->t('I acknowledge I may lose data. Continue anyway.'));
-    $this->drupalPostForm(NULL, [], $this->t('I acknowledge I may lose data. Continue anyway.'));
+    $this->submitForm([], $this->t('I acknowledge I may lose data. Continue anyway.'));
     $session->statusCodeEquals(200);
 
     // Perform the upgrade.

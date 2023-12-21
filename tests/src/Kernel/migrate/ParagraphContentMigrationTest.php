@@ -19,7 +19,7 @@ class ParagraphContentMigrationTest extends ParagraphsMigrationTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'comment',
     'datetime',
     'datetime_range',
@@ -37,13 +37,12 @@ class ParagraphContentMigrationTest extends ParagraphsMigrationTestBase {
     'user',
     'content_translation',
     'language',
-    'migrate_drupal_multilingual',
   ];
 
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('file');
@@ -68,7 +67,7 @@ class ParagraphContentMigrationTest extends ParagraphsMigrationTestBase {
     // migrate the public files.
     $fs_fixture_path = implode(DIRECTORY_SEPARATOR, [
       DRUPAL_ROOT,
-      drupal_get_path('module', 'paragraphs_migration'),
+      \Drupal::service('extension.list.module')->getPath('paragraphs_migration'),
       'tests',
       'fixtures',
     ]);

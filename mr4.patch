@@ -1,0 +1,541 @@
+From 3d005d1b832604ac60601a7277bba7109a49ba80 Mon Sep 17 00:00:00 2001
+From: Geoffrey Roberts <geoffrey.roberts@sl.nsw.gov.au>
+Date: Wed, 8 Nov 2023 17:07:41 +1100
+Subject: [PATCH 1/5] 3297822: Applied rector patch #3
+
+---
+ .../Migrate/MigrateUiParagraphsTestBase.php          | 12 ++++++------
+ .../Plugin/migrate/source/ParagraphsTypeTest.php     |  2 +-
+ .../Kernel/migrate/FieldCollectionItemSourceTest.php |  2 +-
+ .../Kernel/migrate/FieldCollectionTypeSourceTest.php |  2 +-
+ tests/src/Kernel/migrate/MultifieldTest.php          | 10 +++++-----
+ .../Kernel/migrate/ParagraphContentMigrationTest.php |  6 +++---
+ .../Kernel/migrate/ParagraphsFieldMigrationTest.php  |  2 +-
+ .../src/Kernel/migrate/ParagraphsItemSourceTest.php  |  2 +-
+ .../Kernel/migrate/ParagraphsMigrationTestBase.php   |  4 ++--
+ .../src/Kernel/migrate/ParagraphsTypeSourceTest.php  |  2 +-
+ .../migrate/FieldCollectionFieldSettingsTest.php     |  2 +-
+ .../FieldCollectionsFieldInstanceSettingsTest.php    |  4 +++-
+ .../src/Unit/migrate/MigrationPluginsAltererTest.php |  2 +-
+ .../migrate/ParagraphsFieldInstanceSettingsTest.php  |  4 +++-
+ .../src/Unit/migrate/ParagraphsFieldSettingsTest.php |  2 +-
+ .../Unit/migrate/ParagraphsProcessOnValueTest.php    |  2 +-
+ tests/src/Unit/migrate/ProcessTestCase.php           |  8 +++-----
+ 17 files changed, 35 insertions(+), 33 deletions(-)
+
+diff --git a/tests/src/Functional/Migrate/MigrateUiParagraphsTestBase.php b/tests/src/Functional/Migrate/MigrateUiParagraphsTestBase.php
+index cd73ed1..42da48d 100644
+--- a/tests/src/Functional/Migrate/MigrateUiParagraphsTestBase.php
++++ b/tests/src/Functional/Migrate/MigrateUiParagraphsTestBase.php
+@@ -21,7 +21,7 @@ abstract class MigrateUiParagraphsTestBase extends MigrateUpgradeTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = [
++  protected static $modules = [
+     'content_translation',
+     'migrate_drupal_ui',
+     'telephone',
+@@ -32,14 +32,14 @@ abstract class MigrateUiParagraphsTestBase extends MigrateUpgradeTestBase {
+    * {@inheritdoc}
+    */
+   protected function getSourceBasePath() {
+-    return drupal_get_path('module', 'paragraphs_migration') . '/tests/fixtures';
++    return \Drupal::service('extension.list.module')->getPath('paragraphs_migration') . '/tests/fixtures';
+   }
+ 
+   /**
+    * {@inheritdoc}
+    */
+   protected function getSourcePrivateFilesPath() {
+-    return drupal_get_path('module', 'paragraphs_migration') . '/tests/fixtures';
++    return \Drupal::service('extension.list.module')->getPath('paragraphs_migration') . '/tests/fixtures';
+   }
+ 
+   /**
+@@ -490,10 +490,10 @@ abstract class MigrateUiParagraphsTestBase extends MigrateUpgradeTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  protected function setUp() {
++  protected function setUp(): void {
+     parent::setUp();
+ 
+-    $this->loadFixture(drupal_get_path('module', 'paragraphs_migration') . '/tests/fixtures/drupal7.php');
++    $this->loadFixture(\Drupal::service('extension.list.module')->getPath('paragraphs_migration') . '/tests/fixtures/drupal7.php');
+   }
+ 
+   /**
+@@ -506,7 +506,7 @@ abstract class MigrateUiParagraphsTestBase extends MigrateUpgradeTestBase {
+ 
+     // ID conflict form.
+     $session->buttonExists($this->t('I acknowledge I may lose data. Continue anyway.'));
+-    $this->drupalPostForm(NULL, [], $this->t('I acknowledge I may lose data. Continue anyway.'));
++    $this->submitForm([], $this->t('I acknowledge I may lose data. Continue anyway.'));
+     $session->statusCodeEquals(200);
+ 
+     // Perform the upgrade.
+diff --git a/tests/src/Kernel/Plugin/migrate/source/ParagraphsTypeTest.php b/tests/src/Kernel/Plugin/migrate/source/ParagraphsTypeTest.php
+index 413ce02..da5c46f 100644
+--- a/tests/src/Kernel/Plugin/migrate/source/ParagraphsTypeTest.php
++++ b/tests/src/Kernel/Plugin/migrate/source/ParagraphsTypeTest.php
+@@ -15,7 +15,7 @@ class ParagraphsTypeTest extends MigrateSqlSourceTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = [
++  protected static $modules = [
+     'migrate_drupal',
+     'paragraphs',
+     'paragraphs_migration',
+diff --git a/tests/src/Kernel/migrate/FieldCollectionItemSourceTest.php b/tests/src/Kernel/migrate/FieldCollectionItemSourceTest.php
+index f5079ee..98c7b72 100644
+--- a/tests/src/Kernel/migrate/FieldCollectionItemSourceTest.php
++++ b/tests/src/Kernel/migrate/FieldCollectionItemSourceTest.php
+@@ -18,7 +18,7 @@ class FieldCollectionItemSourceTest extends MigrateSqlSourceTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = ['migrate_drupal', 'paragraphs',
++  protected static $modules = ['migrate_drupal', 'paragraphs',
+     'paragraphs_migration',
+   ];
+ 
+diff --git a/tests/src/Kernel/migrate/FieldCollectionTypeSourceTest.php b/tests/src/Kernel/migrate/FieldCollectionTypeSourceTest.php
+index 54043e9..2cb01c6 100644
+--- a/tests/src/Kernel/migrate/FieldCollectionTypeSourceTest.php
++++ b/tests/src/Kernel/migrate/FieldCollectionTypeSourceTest.php
+@@ -18,7 +18,7 @@ class FieldCollectionTypeSourceTest extends MigrateSqlSourceTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = ['migrate_drupal', 'paragraphs',
++  protected static $modules = ['migrate_drupal', 'paragraphs',
+     'paragraphs_migration',
+   ];
+ 
+diff --git a/tests/src/Kernel/migrate/MultifieldTest.php b/tests/src/Kernel/migrate/MultifieldTest.php
+index c7e56b7..f6a4581 100644
+--- a/tests/src/Kernel/migrate/MultifieldTest.php
++++ b/tests/src/Kernel/migrate/MultifieldTest.php
+@@ -22,7 +22,7 @@ class MultifieldTest extends MigrateDrupalTestBase {
+    *   support ends.
+    * @see https://www.drupal.org/node/2909426
+    */
+-  public static $modules = [
++  protected static $modules = [
+     'comment',
+     'config_translation',
+     'content_translation',
+@@ -52,7 +52,7 @@ class MultifieldTest extends MigrateDrupalTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function setUp() {
++  public function setUp(): void {
+     MigrateDrupalTestBase::setUp();
+ 
+     $this->installEntitySchema('file');
+@@ -67,14 +67,14 @@ class MultifieldTest extends MigrateDrupalTestBase {
+     $this->installConfig(['comment', 'node']);
+ 
+     $this->loadFixture(implode(DIRECTORY_SEPARATOR, [
+-      drupal_get_path('module', 'migrate_drupal'),
++      \Drupal::service('extension.list.module')->getPath('migrate_drupal'),
+       'tests',
+       'fixtures',
+       'drupal7.php',
+     ]));
+ 
+     $this->loadFixture(implode(DIRECTORY_SEPARATOR, [
+-      drupal_get_path('module', 'paragraphs_migration'),
++      \Drupal::service('extension.list.module')->getPath('paragraphs_migration'),
+       'tests',
+       'fixtures',
+       'drupal7_multifield_on_core_fixture.php',
+@@ -90,7 +90,7 @@ class MultifieldTest extends MigrateDrupalTestBase {
+     // migrate the public files.
+     $fs_fixture_path = implode(DIRECTORY_SEPARATOR, [
+       DRUPAL_ROOT,
+-      drupal_get_path('module', 'paragraphs_migration'),
++      \Drupal::service('extension.list.module')->getPath('paragraphs_migration'),
+       'tests',
+       'fixtures',
+     ]);
+diff --git a/tests/src/Kernel/migrate/ParagraphContentMigrationTest.php b/tests/src/Kernel/migrate/ParagraphContentMigrationTest.php
+index 14be91b..1c9c715 100644
+--- a/tests/src/Kernel/migrate/ParagraphContentMigrationTest.php
++++ b/tests/src/Kernel/migrate/ParagraphContentMigrationTest.php
+@@ -19,7 +19,7 @@ class ParagraphContentMigrationTest extends ParagraphsMigrationTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = [
++  protected static $modules = [
+     'comment',
+     'datetime',
+     'datetime_range',
+@@ -43,7 +43,7 @@ class ParagraphContentMigrationTest extends ParagraphsMigrationTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function setUp() {
++  public function setUp(): void {
+     parent::setUp();
+ 
+     $this->installEntitySchema('file');
+@@ -68,7 +68,7 @@ class ParagraphContentMigrationTest extends ParagraphsMigrationTestBase {
+     // migrate the public files.
+     $fs_fixture_path = implode(DIRECTORY_SEPARATOR, [
+       DRUPAL_ROOT,
+-      drupal_get_path('module', 'paragraphs_migration'),
++      \Drupal::service('extension.list.module')->getPath('paragraphs_migration'),
+       'tests',
+       'fixtures',
+     ]);
+diff --git a/tests/src/Kernel/migrate/ParagraphsFieldMigrationTest.php b/tests/src/Kernel/migrate/ParagraphsFieldMigrationTest.php
+index 9ef33b3..0d4d19a 100644
+--- a/tests/src/Kernel/migrate/ParagraphsFieldMigrationTest.php
++++ b/tests/src/Kernel/migrate/ParagraphsFieldMigrationTest.php
+@@ -18,7 +18,7 @@ class ParagraphsFieldMigrationTest extends ParagraphsMigrationTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = [
++  protected static $modules = [
+     'comment',
+     'datetime',
+     'datetime_range',
+diff --git a/tests/src/Kernel/migrate/ParagraphsItemSourceTest.php b/tests/src/Kernel/migrate/ParagraphsItemSourceTest.php
+index 8026be4..0b7ce27 100644
+--- a/tests/src/Kernel/migrate/ParagraphsItemSourceTest.php
++++ b/tests/src/Kernel/migrate/ParagraphsItemSourceTest.php
+@@ -18,7 +18,7 @@ class ParagraphsItemSourceTest extends MigrateSqlSourceTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = ['migrate_drupal', 'paragraphs',
++  protected static $modules = ['migrate_drupal', 'paragraphs',
+     'paragraphs_migration',
+   ];
+ 
+diff --git a/tests/src/Kernel/migrate/ParagraphsMigrationTestBase.php b/tests/src/Kernel/migrate/ParagraphsMigrationTestBase.php
+index 95b400e..618a164 100644
+--- a/tests/src/Kernel/migrate/ParagraphsMigrationTestBase.php
++++ b/tests/src/Kernel/migrate/ParagraphsMigrationTestBase.php
+@@ -16,7 +16,7 @@ abstract class ParagraphsMigrationTestBase extends MigrateDrupalTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = [
++  protected static $modules = [
+     'entity_reference_revisions',
+     'migrate',
+     'migrate_drupal',
+@@ -29,7 +29,7 @@ abstract class ParagraphsMigrationTestBase extends MigrateDrupalTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function setUp() {
++  public function setUp(): void {
+     parent::setUp();
+     $this->loadFixture(__DIR__ . '/../../../fixtures/drupal7.php');
+ 
+diff --git a/tests/src/Kernel/migrate/ParagraphsTypeSourceTest.php b/tests/src/Kernel/migrate/ParagraphsTypeSourceTest.php
+index da38f58..a3b7f45 100644
+--- a/tests/src/Kernel/migrate/ParagraphsTypeSourceTest.php
++++ b/tests/src/Kernel/migrate/ParagraphsTypeSourceTest.php
+@@ -18,7 +18,7 @@ class ParagraphsTypeSourceTest extends MigrateSqlSourceTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = ['migrate_drupal', 'paragraphs',
++  protected static $modules = ['migrate_drupal', 'paragraphs',
+     'paragraphs_migration',
+   ];
+ 
+diff --git a/tests/src/Unit/migrate/FieldCollectionFieldSettingsTest.php b/tests/src/Unit/migrate/FieldCollectionFieldSettingsTest.php
+index bd323ee..aac2591 100644
+--- a/tests/src/Unit/migrate/FieldCollectionFieldSettingsTest.php
++++ b/tests/src/Unit/migrate/FieldCollectionFieldSettingsTest.php
+@@ -16,7 +16,7 @@ class FieldCollectionFieldSettingsTest extends MigrateProcessTestCase {
+   /**
+    * {@inheritdoc}
+    */
+-  protected function setUp() {
++  protected function setUp(): void {
+     $this->plugin = new FieldCollectionFieldSettings([], 'pm_field_collection_field_settings', []);
+     parent::setUp();
+ 
+diff --git a/tests/src/Unit/migrate/FieldCollectionsFieldInstanceSettingsTest.php b/tests/src/Unit/migrate/FieldCollectionsFieldInstanceSettingsTest.php
+index a9311b5..9a092b8 100644
+--- a/tests/src/Unit/migrate/FieldCollectionsFieldInstanceSettingsTest.php
++++ b/tests/src/Unit/migrate/FieldCollectionsFieldInstanceSettingsTest.php
+@@ -2,6 +2,7 @@
+ 
+ namespace Drupal\Tests\paragraphs_migration\Unit\migrate;
+ 
++use Prophecy\PhpUnit\ProphecyTrait;
+ use Drupal\migrate\MigrateLookupInterface;
+ use Drupal\migrate\MigrateSkipRowException;
+ use Drupal\paragraphs_migration\Plugin\migrate\process\FieldCollectionFieldInstanceSettings;
+@@ -15,6 +16,7 @@ use Prophecy\Argument;
+  */
+ class FieldCollectionsFieldInstanceSettingsTest extends ProcessTestCase {
+ 
++  use ProphecyTrait;
+   /**
+    * MigrateLookup object prophecy.
+    *
+@@ -25,7 +27,7 @@ class FieldCollectionsFieldInstanceSettingsTest extends ProcessTestCase {
+   /**
+    * {@inheritdoc}
+    */
+-  protected function setUp() {
++  protected function setUp(): void {
+     parent::setUp();
+ 
+     $this->lookup = $this->prophesize(MigrateLookupInterface::class);
+diff --git a/tests/src/Unit/migrate/MigrationPluginsAltererTest.php b/tests/src/Unit/migrate/MigrationPluginsAltererTest.php
+index 890df44..2b9f938 100644
+--- a/tests/src/Unit/migrate/MigrationPluginsAltererTest.php
++++ b/tests/src/Unit/migrate/MigrationPluginsAltererTest.php
+@@ -26,7 +26,7 @@ class MigrationPluginsAltererTest extends UnitTestCase {
+   /**
+    * {@inheritdoc}
+    */
+-  protected function setUp() {
++  protected function setUp(): void {
+     parent::setUp();
+ 
+     $this->paragraphsMigrationPluginsAlterer = new MigrationPluginsAlterer();
+diff --git a/tests/src/Unit/migrate/ParagraphsFieldInstanceSettingsTest.php b/tests/src/Unit/migrate/ParagraphsFieldInstanceSettingsTest.php
+index c591c14..9edb360 100644
+--- a/tests/src/Unit/migrate/ParagraphsFieldInstanceSettingsTest.php
++++ b/tests/src/Unit/migrate/ParagraphsFieldInstanceSettingsTest.php
+@@ -2,6 +2,7 @@
+ 
+ namespace Drupal\Tests\paragraphs_migration\Unit\migrate;
+ 
++use Prophecy\PhpUnit\ProphecyTrait;
+ use Drupal\migrate\MigrateLookupInterface;
+ use Drupal\paragraphs_migration\Plugin\migrate\process\ParagraphsFieldInstanceSettings;
+ use Prophecy\Argument;
+@@ -14,10 +15,11 @@ use Prophecy\Argument;
+  */
+ class ParagraphsFieldInstanceSettingsTest extends ProcessTestCase {
+ 
++  use ProphecyTrait;
+   /**
+    * {@inheritdoc}
+    */
+-  protected function setUp() {
++  protected function setUp(): void {
+     parent::setUp();
+     $this->row->expects($this->any())
+       ->method('getSourceProperty')
+diff --git a/tests/src/Unit/migrate/ParagraphsFieldSettingsTest.php b/tests/src/Unit/migrate/ParagraphsFieldSettingsTest.php
+index ff53dd1..cf2291e 100644
+--- a/tests/src/Unit/migrate/ParagraphsFieldSettingsTest.php
++++ b/tests/src/Unit/migrate/ParagraphsFieldSettingsTest.php
+@@ -16,7 +16,7 @@ class ParagraphsFieldSettingsTest extends MigrateProcessTestCase {
+   /**
+    * {@inheritdoc}
+    */
+-  protected function setUp() {
++  protected function setUp(): void {
+     $this->plugin = new ParagraphsFieldSettings([], 'pm_paragraphs_field_settings', []);
+     parent::setUp();
+ 
+diff --git a/tests/src/Unit/migrate/ParagraphsProcessOnValueTest.php b/tests/src/Unit/migrate/ParagraphsProcessOnValueTest.php
+index 825b66b..75ff4b2 100644
+--- a/tests/src/Unit/migrate/ParagraphsProcessOnValueTest.php
++++ b/tests/src/Unit/migrate/ParagraphsProcessOnValueTest.php
+@@ -26,7 +26,7 @@ class ParagraphsProcessOnValueTest extends ProcessTestCase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function setup() {
++  public function setup(): void {
+     parent::setup();
+     $configuration = [
+       'source_value' => 'source',
+diff --git a/tests/src/Unit/migrate/ProcessTestCase.php b/tests/src/Unit/migrate/ProcessTestCase.php
+index 0ebfbd3..1ee00f2 100644
+--- a/tests/src/Unit/migrate/ProcessTestCase.php
++++ b/tests/src/Unit/migrate/ProcessTestCase.php
+@@ -13,19 +13,17 @@ abstract class ProcessTestCase extends MigrateProcessTestCase {
+   /**
+    * The entity bundle info service.
+    *
+-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\PHPUnit_Framework_MockObject_InvocationMocker
++   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\PHPUnit\Framework\MockObject\InvocationMocker
+    */
+   protected $entityTypeBundleInfo;
+ 
+   /**
+    * {@inheritdoc}
+    */
+-  protected function setup() {
++  protected function setup(): void {
+     parent::setUp();
+ 
+-    $this->entityTypeBundleInfo = $this->getMockBuilder(EntityTypeBundleInfo::class)
+-      ->disableOriginalConstructor()
+-      ->getMock();
++    $this->entityTypeBundleInfo = $this->createMock(EntityTypeBundleInfo::class);
+     $bundles = [
+       'paragraph_bundle_one' => [],
+       'paragraph_bundle_two' => [],
+-- 
+GitLab
+
+
+From 029fae05d5febe66f427c6c67e655432e41f57dc Mon Sep 17 00:00:00 2001
+From: Geoffrey Roberts <geoffrey.roberts@sl.nsw.gov.au>
+Date: Wed, 8 Nov 2023 17:13:59 +1100
+Subject: [PATCH 2/5] 3297822: Allow D10
+
+---
+ composer.json                 | 2 +-
+ paragraphs_migration.info.yml | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/composer.json b/composer.json
+index 642d805..ea2ec46 100644
+--- a/composer.json
++++ b/composer.json
+@@ -1,7 +1,7 @@
+ {
+     "name": "drupal/paragraphs_migration",
+     "type": "drupal-module",
+-    "description": "Drupal 7 to Drupal 8/9 migration path for the D7 Field Collection, D7 Paragraphs, D7 Multifield.",
++    "description": "Drupal 7 to Drupal 8/9/10 migration path for the D7 Field Collection, D7 Paragraphs, D7 Multifield.",
+     "keywords": [
+       "Drupal"
+     ],
+diff --git a/paragraphs_migration.info.yml b/paragraphs_migration.info.yml
+index 08ae845..ae4539d 100644
+--- a/paragraphs_migration.info.yml
++++ b/paragraphs_migration.info.yml
+@@ -1,7 +1,7 @@
+ name: 'Paragraphs Migration'
+ type: module
+-description: 'Drupal 7 to Drupal 8/9 migration path for the D7 Field Collection, D7 Paragraphs, D7 Multifield.'
+-core_version_requirement: ^9
++description: 'Drupal 7 to Drupal 8/9/10 migration path for the D7 Field Collection, D7 Paragraphs, D7 Multifield.'
++core_version_requirement: ^9 || ^10
+ package: 'Migration'
+ dependencies:
+   - migmag:migmag_process
+-- 
+GitLab
+
+
+From 0108687e3d1360cc9e7902b9405f2b3ee394a9f5 Mon Sep 17 00:00:00 2001
+From: Geoffrey Roberts <geoffrey.roberts@sl.nsw.gov.au>
+Date: Wed, 8 Nov 2023 17:28:06 +1100
+Subject: [PATCH 3/5] 3297822: Remove deprecated assertArrayEquals
+
+---
+ tests/src/Unit/migrate/FieldCollectionFieldSettingsTest.php | 4 ++--
+ tests/src/Unit/migrate/ParagraphsFieldSettingsTest.php      | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/src/Unit/migrate/FieldCollectionFieldSettingsTest.php b/tests/src/Unit/migrate/FieldCollectionFieldSettingsTest.php
+index aac2591..c69aec4 100644
+--- a/tests/src/Unit/migrate/FieldCollectionFieldSettingsTest.php
++++ b/tests/src/Unit/migrate/FieldCollectionFieldSettingsTest.php
+@@ -31,7 +31,7 @@ class FieldCollectionFieldSettingsTest extends MigrateProcessTestCase {
+       ->with('type')
+       ->willReturn('field_collection');
+     $value = $this->plugin->transform([], $this->migrateExecutable, $this->row, 'settings');
+-    $this->assertArrayEquals(['target_type' => 'paragraph'], $value);
++    $this->assertEquals(['target_type' => 'paragraph'], $value);
+   }
+ 
+   /**
+@@ -55,7 +55,7 @@ class FieldCollectionFieldSettingsTest extends MigrateProcessTestCase {
+       ->with('type')
+       ->willReturn('taxonomy_term');
+     $value = $this->plugin->transform(['target_type' => 'some_preset_vaue'], $this->migrateExecutable, $this->row, 'settings');
+-    $this->assertArrayEquals(['target_type' => 'some_preset_vaue'], $value);
++    $this->assertEquals(['target_type' => 'some_preset_vaue'], $value);
+   }
+ 
+ }
+diff --git a/tests/src/Unit/migrate/ParagraphsFieldSettingsTest.php b/tests/src/Unit/migrate/ParagraphsFieldSettingsTest.php
+index cf2291e..5580bef 100644
+--- a/tests/src/Unit/migrate/ParagraphsFieldSettingsTest.php
++++ b/tests/src/Unit/migrate/ParagraphsFieldSettingsTest.php
+@@ -31,7 +31,7 @@ class ParagraphsFieldSettingsTest extends MigrateProcessTestCase {
+       ->with('type')
+       ->willReturn('paragraphs');
+     $value = $this->plugin->transform([], $this->migrateExecutable, $this->row, 'settings');
+-    $this->assertArrayEquals(['target_type' => 'paragraph'], $value);
++    $this->assertEquals(['target_type' => 'paragraph'], $value);
+   }
+ 
+   /**
+@@ -55,7 +55,7 @@ class ParagraphsFieldSettingsTest extends MigrateProcessTestCase {
+       ->with('type')
+       ->willReturn('taxonomy_term');
+     $value = $this->plugin->transform(['target_type' => 'some_preset_vaue'], $this->migrateExecutable, $this->row, 'settings');
+-    $this->assertArrayEquals(['target_type' => 'some_preset_vaue'], $value);
++    $this->assertEquals(['target_type' => 'some_preset_vaue'], $value);
+   }
+ 
+ }
+-- 
+GitLab
+
+
+From 6eec2dba353fb8b7e84cd7d82e8c46c9f384eab4 Mon Sep 17 00:00:00 2001
+From: Geoffrey Roberts <geoffrey.roberts@sl.nsw.gov.au>
+Date: Wed, 8 Nov 2023 17:53:56 +1100
+Subject: [PATCH 4/5] 3297822: Remove migrate_drupal_multilingual
+
+---
+ tests/src/Kernel/migrate/ParagraphContentMigrationTest.php | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tests/src/Kernel/migrate/ParagraphContentMigrationTest.php b/tests/src/Kernel/migrate/ParagraphContentMigrationTest.php
+index 1c9c715..8e6f3b5 100644
+--- a/tests/src/Kernel/migrate/ParagraphContentMigrationTest.php
++++ b/tests/src/Kernel/migrate/ParagraphContentMigrationTest.php
+@@ -37,7 +37,6 @@ class ParagraphContentMigrationTest extends ParagraphsMigrationTestBase {
+     'user',
+     'content_translation',
+     'language',
+-    'migrate_drupal_multilingual',
+   ];
+ 
+   /**
+-- 
+GitLab
+
+
+From e876fe62b8d8db6bd5ea7fad25178b763c8fac68 Mon Sep 17 00:00:00 2001
+From: Geoffrey Roberts <geoffrey.roberts@sl.nsw.gov.au>
+Date: Wed, 8 Nov 2023 18:12:07 +1100
+Subject: [PATCH 5/5] 3297822: Coding standards
+
+---
+ tests/src/Unit/migrate/ParagraphsFieldInstanceSettingsTest.php | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/src/Unit/migrate/ParagraphsFieldInstanceSettingsTest.php b/tests/src/Unit/migrate/ParagraphsFieldInstanceSettingsTest.php
+index 9edb360..794ba35 100644
+--- a/tests/src/Unit/migrate/ParagraphsFieldInstanceSettingsTest.php
++++ b/tests/src/Unit/migrate/ParagraphsFieldInstanceSettingsTest.php
+@@ -16,6 +16,7 @@ use Prophecy\Argument;
+ class ParagraphsFieldInstanceSettingsTest extends ProcessTestCase {
+ 
+   use ProphecyTrait;
++
+   /**
+    * {@inheritdoc}
+    */
+-- 
+GitLab
+

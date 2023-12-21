@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\paragraphs_migration\Unit\migrate;
 
+use Prophecy\PhpUnit\ProphecyTrait;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\paragraphs_migration\Plugin\migrate\process\ParagraphsFieldInstanceSettings;
 use Prophecy\Argument;
@@ -14,10 +15,12 @@ use Prophecy\Argument;
  */
 class ParagraphsFieldInstanceSettingsTest extends ProcessTestCase {
 
+  use ProphecyTrait;
+
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->row->expects($this->any())
       ->method('getSourceProperty')
